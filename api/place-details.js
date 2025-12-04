@@ -1,48 +1,34 @@
-const axios = require('axios');
+import axios from 'axios';
 
-exports.handler = async (event, context) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const authHeader = event.headers.authorization;
+    const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ error: 'No authorization token provided' }),
-      };
+      return res.status(401).json({ error: 'No authorization token provided' });
     }
 
-    const { place_id } = JSON.parse(event.body);
+    const { place_id } = req.body;
 
     const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
     if (!GOOGLE_MAPS_API_KEY) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'API key not configured' }),
-      };
+      return res.status(500).json({ error: 'API key not configured' });
     }
 
     const response = await axios.get(
-      'https://maps.googleapis.com/maps/api/place/details/json',
+      `https://maps.googleapis.com/maps/api/place/details/json`,
       {
         params: {
           place_id: place_id,
@@ -51,20 +37,12 @@ exports.handler = async (event, context) => {
       }
     );
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(response.data),
-    };
+    return res.status(200).json(response.data);
   } catch (error) {
     console.error('Error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ 
-        error: 'Internal server error',
-        message: error.message 
-      }),
-    };
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: error.message 
+    });
   }
-};
+}
