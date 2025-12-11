@@ -2,7 +2,15 @@
   "name": "pub-crawler-backend",
   "version": "1.0.0",
   "type": "module",
+  "description": "Backend API for Pub Crawl Planner",
+  "main": "api/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
-    "axios": "^1.6.0"
+    "firebase-admin": "^12.0.0"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }
