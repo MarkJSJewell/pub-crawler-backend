@@ -17,12 +17,13 @@ if (!admin.apps.length) {
 }
 
 export default async function handler(req, res) {
-  // Enable CORS
+  // Enable CORS - MUST be first
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Firebase-AppCheck');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
 
-  // Handle OPTIONS preflight request
+  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
